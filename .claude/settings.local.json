@@ -23,7 +23,16 @@
       "Bash(curl -s http://localhost:8000/api/companies)",
       "Bash(curl -s http://localhost:3000)",
       "Bash(pkill -f \"php artisan serve\")",
-      "Bash(curl -s -H \"Authorization: Bearer 1|vjg1os7gdzXwLud5xmHBSpmPTts1A00eGdrbhTik251e4eab\" http://localhost:8000/api/companies)"
+      "Bash(curl -s -H \"Authorization: Bearer 1|vjg1os7gdzXwLud5xmHBSpmPTts1A00eGdrbhTik251e4eab\" http://localhost:8000/api/companies)",
+      "Bash(curl -s -X POST http://localhost:8000/api/login -H \"Content-Type: application/json\" -d '{\"email\":\"test@example.com\",\"password\":\"password123\"}')",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -X POST http://localhost:8000/api/login -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{\"email\":\"demo@stockanalyzer.com\",\"password\":\"demo123\"}')",
+      "Bash(curl -s http://localhost:8001/openapi.json)",
+      "Bash(curl -s \"https://dps.psx.com.pk/announcements\")",
+      "Bash(curl -s \"https://dps.psx.com.pk/api/announcements?page=1&limit=10\" -H \"Accept: application/json\")",
+      "Bash(curl -X POST http://localhost:8001/detect-volume-spike -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(chmod +x \"/Users/ansari/Projects/AI Projects/StockAnalyzer/test_ai_demo.sh\")",
+      "Bash(\"/Users/ansari/Projects/AI Projects/StockAnalyzer/test_ai_demo.sh\")"
     ]
   }
 }

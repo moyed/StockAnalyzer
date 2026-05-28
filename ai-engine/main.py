@@ -147,3 +147,204 @@ async def analyze(req: AnalyzeRequest):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# New endpoints for news and volume analysis
+
+class NewsAnalysisRequest(BaseModel):
+    headline: str
+    body: str
+    source: str = "unknown"
+
+
+class VolumeSpikeRequest(BaseModel):
+    symbol: str
+    current_volume: int
+    avg_30d_volume: int
+    current_price: float
+    prev_close: float
+
+
+class MarketBriefingRequest(BaseModel):
+    top_gainers: list  # [{symbol, change_pct, price}]
+    top_losers: list
+    sector_performance: dict  # {sector: change_pct}
+    news_headlines: list  # [headline strings]
+
+
+@app.post("/analyze-news")
+async def analyze_news(req: NewsAnalysisRequest):
+    """Analyze news article sentiment and extract mentioned companies."""
+    prompt = f"""You are a financial news analyst for Pakistan Stock Exchange (PSX).
+
+Analyze this news article and return ONLY valid JSON:
+
+Headline: {req.headline}
+Source: {req.source}
+Body: {req.body[:2000]}
+
+Return this exact JSON structure:
+{{
+  "sentiment": "<positive|neutral|negative>",
+  "impact": "<high|medium|low>",
+  "mentioned_symbols": ["<list of PSX stock symbols mentioned>"],
+  "category": "<earnings|announcement|macro|sector|other>",
+  "summary": "<one sentence summary of what this means for investors>"
+}}
+
+Rules:
+- sentiment: positive if bullish news, negative if bearish, neutral otherwise
+- impact: high if major news (results, regulatory), medium if sector news, low if general
+- mentioned_symbols: extract only valid PSX symbols (e.g. MARI, OGDC, PSO)
+- category: classify the news type
+"""
+
+    try:
+        raw = call_ai(prompt)
+        result = parse_ai_response(raw)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/detect-volume-spike")
+async def detect_volume_spike(req: VolumeSpikeRequest):
+    """Detect unusual volume activity and explain possible reasons."""
+    ratio = req.current_volume / req.avg_30d_volume if req.avg_30d_volume > 0 else 0
+    price_change_pct = ((req.current_price - req.prev_close) / req.prev_close * 100) if req.prev_close > 0 else 0
+
+    spike_detected = ratio > 2.0  # 2x average volume
+
+    # Use AI to explain the spike
+    if spike_detected:
+        prompt = f"""You are a stock analyst. Explain this unusual activity:
+
+Symbol: {req.symbol}
+Volume: {req.current_volume:,} (normally {req.avg_30d_volume:,})
+Volume ratio: {ratio:.1f}x normal
+Price change: {price_change_pct:+.2f}%
+
+Provide a brief explanation (1-2 sentences) of what this volume spike might indicate.
+Consider: result announcements, news, sector momentum, or technical breakout.
+
+Return only the explanation text, no JSON.
+"""
+
+        try:
+            explanation = call_ai(prompt).strip()
+        except:
+            explanation = f"Volume is {ratio:.1f}x above normal with {price_change_pct:+.1f}% price change."
+    else:
+        explanation = "No unusual volume activity detected."
+
+    return {
+        "spike_detected": spike_detected,
+        "volume_ratio": round(ratio, 2),
+        "price_change_pct": round(price_change_pct, 2),
+        "severity": "high" if ratio > 5 else "medium" if ratio > 2 else "low",
+        "explanation": explanation
+    }
+
+
+@app.post("/generate-market-briefing")
+async def generate_market_briefing(req: MarketBriefingRequest):
+    """Generate AI-powered daily market summary."""
+
+    gainers_text = "\n".join([f"- {g.get('symbol')}: +{g.get('change_pct')}%" for g in req.top_gainers[:5]])
+    losers_text = "\n".join([f"- {l.get('symbol')}: {l.get('change_pct')}%" for l in req.top_losers[:5]])
+    sectors_text = "\n".join([f"- {sector}: {change:+.1f}%" for sector, change in req.sector_performance.items()])
+    news_text = "\n".join([f"- {h}" for h in req.news_headlines[:3]])
+
+    prompt = f"""You are a PSX market analyst. Write a concise daily market briefing (3-4 sentences).
+
+Today's Market Data:
+
+TOP GAINERS:
+{gainers_text}
+
+TOP LOSERS:
+{losers_text}
+
+SECTOR PERFORMANCE:
+{sectors_text}
+
+MAJOR NEWS:
+{news_text}
+
+Write a professional briefing that explains:
+1. Overall market sentiment
+2. Which sectors led/lagged and why
+3. Key drivers (news, macro, results)
+
+Keep it under 100 words. Write in past tense. Be specific, not generic.
+"""
+
+    try:
+        briefing = call_ai(prompt).strip()
+        return {
+            "date": "today",
+            "briefing": briefing,
+            "top_themes": extract_themes(req)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def extract_themes(req: MarketBriefingRequest) -> list:
+    """Extract key themes from market data."""
+    themes = []
+
+    # Check sector movements
+    for sector, change in req.sector_performance.items():
+        if abs(change) > 2:
+            themes.append(f"{sector} {'rallied' if change > 0 else 'declined'}")
+
+    # Check if market is broad or concentrated
+    if len(req.top_gainers) > 10:
+        themes.append("broad-based rally")
+    elif len(req.top_losers) > 10:
+        themes.append("broad-based selloff")
+
+    return themes[:3]
+
+
+@app.post("/explain-movement")
+async def explain_movement(symbol: str, price_change_pct: float, volume_ratio: float,
+                          recent_news: str = "", sector_change_pct: float = 0):
+    """Explain why a specific stock moved today."""
+
+    prompt = f"""You are a PSX analyst. Explain why {symbol} moved today.
+
+Data:
+- Price change: {price_change_pct:+.1f}%
+- Volume: {volume_ratio:.1f}x normal
+- Sector performance: {sector_change_pct:+.1f}%
+- Recent news: {recent_news if recent_news else "No major news"}
+
+Write a 2-3 sentence explanation of the likely reasons for this movement.
+Consider: company-specific news, sector trends, volume confirmation, or technical factors.
+
+Return only the explanation text.
+"""
+
+    try:
+        explanation = call_ai(prompt).strip()
+
+        # Determine primary driver
+        if abs(price_change_pct) > 5 and volume_ratio > 3:
+            driver = "news or announcement"
+        elif abs(price_change_pct - sector_change_pct) < 1:
+            driver = "sector momentum"
+        elif volume_ratio < 1.5:
+            driver = "technical or passive movement"
+        else:
+            driver = "mixed factors"
+
+        return {
+            "symbol": symbol,
+            "explanation": explanation,
+            "primary_driver": driver,
+            "confidence": "high" if volume_ratio > 2 else "medium"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
