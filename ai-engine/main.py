@@ -8,10 +8,17 @@ import json
 import re
 from gradient import Gradient
 
+from dotenv import load_dotenv
+load_dotenv()  # Load .env file first!
+
 app = FastAPI(title="StockAnalyzer AI Engine")
 
-gradient = Gradient(access_token=os.getenv("GRADIENT_ACCESS_TOKEN", ""))
-MODEL_ID = os.getenv("GRADIENT_MODEL_ID", "llama3-8b-chat")  # override via env
+# DigitalOcean Gradient SDK configuration
+GRADIENT_TOKEN = os.getenv("GRADIENT_ACCESS_TOKEN", "")
+MODEL_ID = os.getenv("GRADIENT_MODEL_ID", "kimi-k2.6")
+
+# Initialize Gradient client
+gradient = Gradient(model_access_key=GRADIENT_TOKEN) if GRADIENT_TOKEN else None
 
 
 class AnalyzeRequest(BaseModel):
@@ -101,9 +108,20 @@ def extract_text(pdf_path: str, max_chars: int = 8000) -> str:
 
 def call_ai(prompt: str) -> str:
     """Call DigitalOcean Gradient LLM."""
-    model = gradient.get_base_model(base_model_slug=MODEL_ID)
-    response = model.complete(query=prompt, max_generated_token_count=1024)
-    return response.generated_output
+    if not gradient:
+        raise RuntimeError("Gradient client not initialized. Check GRADIENT_ACCESS_TOKEN in .env")
+
+    try:
+        # Use the new Gradient SDK chat completions API
+        response = gradient.chat.completions.create(
+            model=MODEL_ID,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=1024,
+            temperature=0.1
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        raise RuntimeError(f"Gradient API error: {str(e)}")
 
 
 def parse_ai_response(raw: str) -> dict:
