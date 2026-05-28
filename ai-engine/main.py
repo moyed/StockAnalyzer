@@ -18,7 +18,7 @@ GRADIENT_TOKEN = os.getenv("GRADIENT_ACCESS_TOKEN", "")
 MODEL_ID = os.getenv("GRADIENT_MODEL_ID", "kimi-k2.6")
 
 # Initialize Gradient client
-gradient = Gradient(model_access_key=GRADIENT_TOKEN) if GRADIENT_TOKEN else None
+gradient = Gradient(model_access_key=GRADIENT_TOKEN, timeout=120.0) if GRADIENT_TOKEN else None
 
 
 class AnalyzeRequest(BaseModel):
@@ -116,7 +116,7 @@ def call_ai(prompt: str) -> str:
         response = gradient.chat.completions.create(
             model=MODEL_ID,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=1024,
+            max_tokens=512,
             temperature=0.1
         )
         return response.choices[0].message.content
@@ -131,6 +131,72 @@ def parse_ai_response(raw: str) -> dict:
     if not match:
         raise ValueError("No JSON found in AI response")
     return json.loads(match.group())
+
+
+class ProjectRequest(BaseModel):
+    company: str
+    symbol: str
+    quarter: str
+    signals: dict  # revenue_growth_pct, profit_growth_pct, gross_margin_direction, management_tone, etc.
+    score: int
+    flags: list
+    summary: str
+    current_price: float = None
+
+
+PROJECTION_PROMPT = """You are a senior financial analyst specializing in Pakistan Stock Exchange (PSX) companies.
+
+Based on the following filing analysis for {company} ({symbol}), generate forward-looking projections for the next quarter.
+Return ONLY valid JSON with no extra text.
+
+Current Quarter: {quarter}
+Analysis Score: {score}/100
+Flags: {flags}
+Summary: {summary}
+
+Key Signals:
+{signals}
+
+Return this exact JSON structure:
+{{
+  "next_quarter_outlook": "<2-3 sentence forward-looking outlook based on the signals>",
+  "projected_revenue_growth_min": <integer percentage>,
+  "projected_revenue_growth_max": <integer percentage>,
+  "projected_profit_growth_min": <integer percentage>,
+  "projected_profit_growth_max": <integer percentage>,
+  "key_catalysts": ["<catalyst 1>", "<catalyst 2>"],
+  "key_risks": ["<risk 1>", "<risk 2>"],
+  "recommendation": "<Strong Buy|Buy|Hold|Sell|Strong Sell>",
+  "confidence": "<high|medium|low>",
+  "target_upside_pct": <integer or null>
+}}
+
+Base projections on the current signals, score, and flags. Be realistic and specific to PSX market conditions."""
+
+
+@app.post("/project")
+async def project(req: ProjectRequest):
+    import json as _json
+
+    signals_text = "\n".join([f"- {k}: {v}" for k, v in req.signals.items()])
+    flags_text = ", ".join(req.flags) if req.flags else "None"
+
+    prompt = PROJECTION_PROMPT.format(
+        company=req.company,
+        symbol=req.symbol,
+        quarter=req.quarter,
+        score=req.score,
+        flags=flags_text,
+        summary=req.summary,
+        signals=signals_text,
+    )
+
+    try:
+        raw = call_ai(prompt)
+        result = parse_ai_response(raw)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/analyze")

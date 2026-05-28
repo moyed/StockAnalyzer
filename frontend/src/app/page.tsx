@@ -1,8 +1,10 @@
 "use client";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const FLAG_COLORS: Record<string, string> = {
@@ -16,6 +18,13 @@ const FLAG_COLORS: Record<string, string> = {
   EXCHANGE_TAILWIND: "bg-cyan-100 text-cyan-800",
 };
 
+const SORT_OPTIONS = [
+  { value: "score",       label: "AI Score" },
+  { value: "filing_date", label: "Filing Date" },
+  { value: "name",        label: "Name A–Z" },
+  { value: "sector",      label: "Sector" },
+];
+
 function ScoreBadge({ score }: { score: number }) {
   const color = score >= 70 ? "bg-green-600" : score >= 40 ? "bg-yellow-500" : "bg-gray-400";
   return (
@@ -26,96 +35,224 @@ function ScoreBadge({ score }: { score: number }) {
 }
 
 export default function DashboardPage() {
+  const [page, setPage]   = useState(1);
+  const [sort, setSort]   = useState("score");
+
   const { data, isLoading } = useQuery({
-    queryKey: ["top-companies"],
-    queryFn: () => api.get("/filings?min_score=60&status=done").then((r) => r.data),
+    queryKey: ["dashboard-companies", page, sort],
+    queryFn: () =>
+      api.get(`/companies?per_page=10&sort=${sort}&page=${page}`).then((r) => r.data),
+    staleTime: 30_000,
   });
 
-  const filings = data?.data ?? [];
+  const companies = data?.data ?? [];
+  const total     = data?.total ?? 0;
+  const lastPage  = data?.last_page ?? 1;
+  const from      = data?.from ?? 0;
+  const to        = data?.to ?? 0;
+
+  function handleSort(value: string) {
+    setSort(value);
+    setPage(1);
+  }
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Top Opportunities</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Companies with strong signals from latest quarterly filings — ranked by AI score
-        </p>
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">All Companies</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {total > 0 ? `Showing ${from}–${to} of ${total} companies` : "No companies yet"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">Sort by</span>
+          <div className="flex gap-1">
+            {SORT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleSort(opt.value)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  sort === opt.value
+                    ? "bg-green-700 text-white border-green-700"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-green-400"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
         <div className="text-gray-400 text-sm">Loading...</div>
-      ) : filings.length === 0 ? (
+      ) : companies.length === 0 ? (
         <Card className="p-8 text-center text-gray-500">
-          No analyzed filings yet.{" "}
+          No companies yet.{" "}
           <Link href="/scan" className="text-green-700 underline">
             Run a scan
           </Link>{" "}
           to get started.
         </Card>
       ) : (
-        <div className="grid gap-4">
-          {filings.map((f: any) => {
-            const analysis = f.ai_analysis ?? {};
-            const signals = analysis.signals ?? {};
-            const flags: string[] = f.score?.flags ?? [];
+        <>
+          <div className="grid gap-4">
+            {companies.map((c: any) => {
+              const filing   = c.latest_filing;
+              const analysis = filing?.ai_analysis ?? {};
+              const signals  = analysis.signals ?? {};
+              const score    = filing?.score?.score;
+              const flags: string[] = Array.isArray(filing?.score?.flags)
+                ? filing.score.flags
+                : [];
 
-            return (
-              <Card key={f.id} className="p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/companies/${f.company_id}`}
-                        className="font-semibold text-gray-900 hover:text-green-700"
-                      >
-                        {f.company?.name ?? "—"}
-                      </Link>
-                      <span className="text-xs text-gray-400">{f.company?.symbol}</span>
-                      <span className="text-xs text-gray-400">{f.quarter}</span>
-                      {f.company?.is_defaulter && (
-                        <Badge variant="destructive" className="text-xs">Defaulter</Badge>
-                      )}
-                    </div>
-
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                      {analysis.summary ?? "Analysis pending"}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {flags.map((flag) => (
-                        <span
-                          key={flag}
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${FLAG_COLORS[flag] ?? "bg-gray-100 text-gray-700"}`}
+              return (
+                <Card key={c.id} className="p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Link
+                          href={`/companies/${c.id}`}
+                          className="font-semibold text-gray-900 hover:text-green-700"
                         >
-                          {flag.replace(/_/g, " ")}
-                        </span>
-                      ))}
+                          {c.name}
+                        </Link>
+                        <span className="text-xs text-gray-400">{c.symbol}</span>
+                        {filing && (
+                          <span className="text-xs text-gray-400">{filing.quarter}</span>
+                        )}
+                        {c.sector && (
+                          <span className="text-xs text-gray-400">· {c.sector}</span>
+                        )}
+                        {c.is_defaulter && (
+                          <Badge variant="destructive" className="text-xs">Defaulter</Badge>
+                        )}
+                      </div>
+
+                      {analysis.summary ? (
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                          {analysis.summary}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-gray-400 mt-1 italic">
+                          {filing ? "Analysis pending" : "No filings yet"}
+                        </p>
+                      )}
+
+                      {flags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {flags.map((flag) => (
+                            <span
+                              key={flag}
+                              className={`text-xs px-2 py-0.5 rounded-full font-medium ${FLAG_COLORS[flag] ?? "bg-gray-100 text-gray-700"}`}
+                            >
+                              {flag.replace(/_/g, " ")}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {(signals.revenue_growth_pct != null ||
+                        signals.profit_growth_pct != null ||
+                        signals.exports_milestone) && (
+                        <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                          {signals.revenue_growth_pct != null && (
+                            <span>
+                              Revenue:{" "}
+                              <strong className="text-gray-800">
+                                +{signals.revenue_growth_pct}%
+                              </strong>
+                            </span>
+                          )}
+                          {signals.profit_growth_pct != null && (
+                            <span>
+                              Profit:{" "}
+                              <strong className="text-gray-800">
+                                +{signals.profit_growth_pct}%
+                              </strong>
+                            </span>
+                          )}
+                          {signals.exports_milestone && (
+                            <span>
+                              Exports:{" "}
+                              <strong className="text-gray-800">
+                                {signals.exports_milestone}
+                              </strong>
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                      {signals.revenue_growth_pct != null && (
-                        <span>Revenue: <strong className="text-gray-800">+{signals.revenue_growth_pct}%</strong></span>
+                    <div className="flex flex-col items-end gap-1 ml-4 shrink-0">
+                      {score != null ? (
+                        <ScoreBadge score={score} />
+                      ) : (
+                        <span className="text-xs text-gray-300 px-2 py-1">—</span>
                       )}
-                      {signals.profit_growth_pct != null && (
-                        <span>Profit: <strong className="text-gray-800">+{signals.profit_growth_pct}%</strong></span>
-                      )}
-                      {signals.exports_milestone && (
-                        <span>Exports: <strong className="text-gray-800">{signals.exports_milestone}</strong></span>
+                      {c.last_price && (
+                        <span className="text-xs text-gray-500">PKR {c.last_price}</span>
                       )}
                     </div>
                   </div>
+                </Card>
+              );
+            })}
+          </div>
 
-                  <div className="flex flex-col items-end gap-1 ml-4">
-                    <ScoreBadge score={f.score?.score ?? 0} />
-                    {f.company?.last_price && (
-                      <span className="text-xs text-gray-500">PKR {f.company.last_price}</span>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+          {lastPage > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Previous
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: lastPage }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === lastPage || Math.abs(p - page) <= 2)
+                  .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, i) =>
+                    p === "..." ? (
+                      <span key={`ellipsis-${i}`} className="px-1 text-gray-400 text-sm">
+                        …
+                      </span>
+                    ) : (
+                      <Button
+                        key={p}
+                        variant={p === page ? "default" : "outline"}
+                        size="sm"
+                        className={`w-8 h-8 p-0 ${
+                          p === page ? "bg-green-700 hover:bg-green-800" : ""
+                        }`}
+                        onClick={() => setPage(p as number)}
+                      >
+                        {p}
+                      </Button>
+                    )
+                  )}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+                disabled={page === lastPage}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

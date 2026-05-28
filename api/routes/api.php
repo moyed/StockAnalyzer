@@ -16,6 +16,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/companies', [CompanyController::class, 'index']);
     Route::get('/companies/{company}', [CompanyController::class, 'show']);
+    Route::get('/companies/{company}/filings', [CompanyController::class, 'filings']);
+    Route::get('/companies/{company}/projection', [CompanyController::class, 'projection']);
+    Route::post('/companies/{company}/scan', [CompanyController::class, 'scan']);
+    Route::post('/companies/{company}/rescan', [CompanyController::class, 'rescan']);
 
     Route::get('/filings', [FilingController::class, 'index']);
     Route::get('/filings/{filing}', [FilingController::class, 'show']);
@@ -26,5 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/watchlist/{company}', [WatchlistController::class, 'update']);
 
     Route::post('/scan', [ScanController::class, 'run']);
+    Route::get('/scan/progress', [ScanController::class, 'progress']);
     Route::get('/scan/status/{job}', [ScanController::class, 'status']);
 });

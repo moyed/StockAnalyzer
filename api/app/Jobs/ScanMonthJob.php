@@ -13,8 +13,10 @@ class ScanMonthJob implements ShouldQueue
 
     public function __construct(public readonly string $month) {}
 
-    public function handle(\App\Services\PsxScraperService $scraper, \App\Services\AiAnalysisService $ai): void
+    public function handle(\App\Services\PsxScraperService $scraper): void
     {
+        \Illuminate\Support\Facades\Cache::put("scan_scraping:{$this->month}", true, now()->addMinutes(30));
+
         $filings = $scraper->fetchTransmissions($this->month);
 
         foreach ($filings as $filingData) {
@@ -36,5 +38,13 @@ class ScanMonthJob implements ShouldQueue
                 \App\Jobs\AnalyzeFilingJob::dispatch($filing->id);
             }
         }
+
+        // Mark scrape as finished — even if 0 filings were found
+        \Illuminate\Support\Facades\Cache::put(
+            "scan_scraped:{$this->month}",
+            ['count' => count($filings), 'at' => now()->toISOString()],
+            now()->addHours(1)
+        );
+        \Illuminate\Support\Facades\Cache::forget("scan_scraping:{$this->month}");
     }
 }

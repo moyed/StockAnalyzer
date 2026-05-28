@@ -19,7 +19,11 @@ class FilingController extends Controller
                 $sq->where('score', '>=', $request->min_score)
             ));
 
-        $filings = $query->orderByDesc('filing_date')->paginate(50);
+        $filings = $query->leftJoin('scores', 'filings.id', '=', 'scores.filing_id')
+            ->orderByDesc('scores.score')
+            ->orderByDesc('filings.filing_date')
+            ->select('filings.*')
+            ->paginate(500);
 
         return response()->json($filings);
     }

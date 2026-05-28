@@ -29,8 +29,8 @@ class AnalyzeFilingJob implements ShouldQueue
             \App\Models\Score::updateOrCreate(
                 ['filing_id' => $filing->id],
                 [
-                    'score'           => $result['score'] ?? 0,
-                    'flags'           => $result['flags'] ?? [],
+                    'score'           => (int) ($result['score'] ?? 0),
+                    'flags'           => is_array($result['flags'] ?? []) ? ($result['flags'] ?? []) : [],
                     'price_at_filing' => $filing->company->last_price,
                 ],
             );
