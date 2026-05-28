@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git remote *)",
+      "Bash(composer --version)",
+      "Bash(npm --version)",
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(composer create-project *)",
+      "Bash(npx create-next-app@latest frontend --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(composer require *)",
+      "Bash(php artisan *)",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npx shadcn@latest add button card badge table tabs input dialog)",
+      "Bash(mkdir -p \"/Users/ansari/Projects/AI Projects/StockAnalyzer/frontend/src/app/scan\" \"/Users/ansari/Projects/AI Projects/StockAnalyzer/frontend/src/app/companies\" \"/Users/ansari/Projects/AI Projects/StockAnalyzer/frontend/src/app/companies/[id]\" \"/Users/ansari/Projects/AI Projects/StockAnalyzer/frontend/src/app/watchlist\" \"/Users/ansari/Projects/AI Projects/StockAnalyzer/frontend/src/app/login\" \"/Users/ansari/Projects/AI Projects/StockAnalyzer/frontend/src/app/register\")",
+      "Bash(npm run *)",
+      "Bash(git add *)"
+    ]
+  }
+}

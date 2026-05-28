@@ -1,0 +1,90 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: stockanalyzer
+      POSTGRES_USER: stockuser
+      POSTGRES_PASSWORD: stockpass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: stockanalyzer
+      DB_USERNAME: stockuser
+      DB_PASSWORD: stockpass
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      AI_ENGINE_URL: http://ai-engine:8001
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./api:/var/www/html
+
+  queue:
+    build: ./api
+    command: php artisan queue:work --sleep=3 --tries=3
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: stockanalyzer
+      DB_USERNAME: stockuser
+      DB_PASSWORD: stockpass
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      AI_ENGINE_URL: http://ai-engine:8001
+    depends_on:
+      - db
+      - redis
+      - api
+
+  scheduler:
+    build: ./api
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction && sleep 60; done"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: stockanalyzer
+      DB_USERNAME: stockuser
+      DB_PASSWORD: stockpass
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+    depends_on:
+      - db
+      - redis
+
+  ai-engine:
+    build: ./ai-engine
+    ports:
+      - "8001:8001"
+    environment:
+      GRADIENT_ACCESS_TOKEN: ${GRADIENT_ACCESS_TOKEN}
+      GRADIENT_MODEL_ID: ${GRADIENT_MODEL_ID:-llama3-8b-chat}
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

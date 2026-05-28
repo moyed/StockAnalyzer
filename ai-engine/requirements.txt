@@ -1,0 +1,7 @@
+fastapi==0.136.3
+uvicorn==0.48.0
+python-multipart==0.0.29
+pdfplumber==0.11.9
+httpx==0.28.1
+python-dotenv==1.2.2
+git+https://github.com/digitalocean/gradient-python.git
