@@ -1,0 +1,11 @@
+
+================================================================================
+  REFINERY SECTOR: Standard vs Agentic Projection Comparison
+================================================================================
+
+1. Checking AI Engine...
+✗ AI Engine not reachable: timed out
+
+✗ Agentic projection not configured!
+  Set ANTHROPIC_API_KEY in ai-engine/.env
+  Run: echo 'ANTHROPIC_API_KEY=sk-ant-xxx' >> ai-engine/.env

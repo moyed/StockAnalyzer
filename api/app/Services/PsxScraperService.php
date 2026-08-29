@@ -146,9 +146,9 @@ class PsxScraperService
         try {
             $date = \Carbon\Carbon::parse($dateStr);
             $q    = (int) ceil($date->month / 3);
-            return "Q{$q}-FY{$date->year}";
+            return "Q{$q}-{$date->year}";
         } catch (\Throwable) {
-            return 'Q?-FY?';
+            return 'Q?-?';
         }
     }
 }

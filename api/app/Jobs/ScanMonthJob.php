@@ -25,6 +25,14 @@ class ScanMonthJob implements ShouldQueue
                 ['name' => $filingData['name'], 'sector' => $filingData['sector'] ?? null],
             );
 
+            $existing = \App\Models\Filing::where('company_id', $company->id)
+                ->where('quarter', $filingData['quarter'])
+                ->first();
+
+            if ($existing && $existing->status === 'done') {
+                continue; // Already analyzed — skip
+            }
+
             $filing = \App\Models\Filing::updateOrCreate(
                 ['company_id' => $company->id, 'quarter' => $filingData['quarter']],
                 [
@@ -34,9 +42,7 @@ class ScanMonthJob implements ShouldQueue
                 ],
             );
 
-            if ($filing->status !== 'done') {
-                \App\Jobs\AnalyzeFilingJob::dispatch($filing->id);
-            }
+            \App\Jobs\AnalyzeFilingJob::dispatch($filing->id);
         }
 
         // Mark scrape as finished — even if 0 filings were found

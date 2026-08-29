@@ -56,7 +56,7 @@ export default function WatchlistPage() {
 
                     {latest && (
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {latest.quarter} · {latest.filing_date}
+                        {latest.quarter} · {new Date(latest.filing_date).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     )}
 

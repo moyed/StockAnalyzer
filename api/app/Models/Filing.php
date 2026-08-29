@@ -8,6 +8,7 @@ class Filing extends Model
 {
     protected $fillable = [
         'company_id', 'quarter', 'filing_date', 'pdf_url', 'pdf_path', 'raw_text', 'ai_analysis', 'status',
+        'eps', 'revenue', 'net_profit', 'shares_outstanding',
     ];
 
     protected $casts = [

@@ -36,6 +36,10 @@ class ScanController extends Controller
             $queued++;
         }
 
+        // Trigger news scrape + market briefing in the background
+        \App\Jobs\ScrapeNewsJob::dispatch();
+        \App\Jobs\GenerateMarketBriefingJob::dispatch();
+
         return response()->json([
             'message' => $month
                 ? "Scan started for {$month}. Re-queued {$queued} existing filings."
@@ -90,6 +94,44 @@ class ScanController extends Controller
                 'failed' => 1,
                 default => 0,
             })->values(),
+        ]);
+    }
+
+    public function syncAllFilings(Request $request)
+    {
+        $symbol = $request->input('symbol');
+
+        if ($symbol) {
+            $companies = \App\Models\Company::where('symbol', strtoupper($symbol))->get();
+        } else {
+            $companies = \App\Models\Company::all();
+        }
+
+        if ($companies->isEmpty()) {
+            return response()->json(['error' => 'No companies found.'], 404);
+        }
+
+        foreach ($companies as $company) {
+            \App\Jobs\SyncCompanyFilingsJob::dispatch($company->id);
+        }
+
+        return response()->json([
+            'message'    => "Queued filing sync for {$companies->count()} companies.",
+            'dispatched' => $companies->count(),
+        ], 202);
+    }
+
+    public function syncPrices()
+    {
+        $result = \Artisan::call('psx:sync-prices');
+        $output = \Artisan::output();
+
+        preg_match('/Updated (\d+) companies/', $output, $m);
+        $updated = isset($m[1]) ? (int) $m[1] : 0;
+
+        return response()->json([
+            'message' => "Synced prices for {$updated} companies.",
+            'updated' => $updated,
         ]);
     }
 

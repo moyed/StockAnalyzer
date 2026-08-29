@@ -25,3 +25,43 @@ frontend/.env.local
 
 # macOS
 .DS_Store
+
+# Runtime logs & artifacts (added before publishing)
+*.log
+logs/
+ai-engine/logs/
+api/storage/logs/
+*.backup
+*.bak
+main.py.
+
+# Local databases
+*.sqlite
+*.sqlite3
+
+# Local env files (belt-and-braces; real secrets live only here)
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.local
+!**/.env.example
+
+# Generated worker script (contains absolute local paths)
+start_workers.sh
+
+# Internal session/status notes (kept local, not published)
+AGENTIC_COMPLETE.md
+AGENTIC_DEPLOYMENT_COMPLETE.md
+AGENTIC_IMPLEMENTATION_SUMMARY.md
+AI_ENGINE_ASYNC_ANALYSIS.md
+ANALYSIS_PERFORMANCE_SUMMARY.md
+ASYNC_OPTIMIZATION_COMPLETE.md
+BACKGROUND_STATUS.md
+COMPLETE_DATA_SUMMARY.md
+PE_RATIO_COMPLETE.md
+PE_RATIO_IMPLEMENTATION.md
+RESULTS.md
+SESSION_SUMMARY.md
+STATUS.md
+SUMMARY.md

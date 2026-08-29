@@ -35,9 +35,45 @@ services:
     volumes:
       - ./api:/var/www/html
 
-  queue:
+  queue-filings:
     build: ./api
-    command: php artisan queue:work --sleep=3 --tries=3
+    command: php artisan queue:work --queue=filings --sleep=3 --tries=3 --timeout=310
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: stockanalyzer
+      DB_USERNAME: stockuser
+      DB_PASSWORD: stockpass
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      AI_ENGINE_URL: http://ai-engine:8001
+    depends_on:
+      - db
+      - redis
+      - api
+
+  queue-projections:
+    build: ./api
+    command: php artisan queue:work --queue=projections --sleep=3 --tries=3 --timeout=190
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: stockanalyzer
+      DB_USERNAME: stockuser
+      DB_PASSWORD: stockpass
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      AI_ENGINE_URL: http://ai-engine:8001
+    depends_on:
+      - db
+      - redis
+      - api
+
+  queue-rescan:
+    build: ./api
+    command: php artisan queue:work --queue=rescan --sleep=3 --tries=3 --timeout=310
     environment:
       DB_CONNECTION: pgsql
       DB_HOST: db

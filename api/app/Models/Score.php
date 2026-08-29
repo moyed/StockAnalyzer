@@ -20,6 +20,11 @@ class Score extends Model
         return is_array($decoded) ? $decoded : [];
     }
 
+    public function setFlagsAttribute($value): void
+    {
+        $this->attributes['flags'] = is_array($value) ? json_encode($value) : ($value ?? '[]');
+    }
+
     public function filing()
     {
         return $this->belongsTo(Filing::class);

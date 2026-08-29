@@ -25,6 +25,10 @@ export default function Navbar() {
     { href: "/scan", label: "Scan" },
     { href: "/companies", label: "Companies" },
     { href: "/watchlist", label: "Watchlist" },
+    { href: "/sectors", label: "Sectors" },
+    { href: "/index", label: "Index" },
+    { href: "/chat", label: "AI Chat" },
+    { href: "/health", label: "Health" },
   ];
 
   return (

@@ -1,11 +1,80 @@
 "use client";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import api from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+
+const KSE100Chart = dynamic(() => import("@/components/KSE100Chart"), {
+  loading: () => (
+    <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+      <div className="h-8 w-48 bg-gray-100 animate-pulse rounded mb-4" />
+      <div className="h-48 bg-gray-50 rounded-xl animate-pulse" />
+    </div>
+  ),
+  ssr: false,
+});
+
+function MarketBriefingCard() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["market-briefing"],
+    queryFn: () => api.get("/market/briefing").then((r) => r.data),
+    staleTime: 30 * 60 * 1000, // 30 min — refreshed by global scan
+  });
+
+  // Don't render if no briefing exists yet
+  if (!isLoading && !data?.briefing) return null;
+
+  return (
+    <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-5 mb-6 shadow-lg text-white">
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">📰</span>
+          <h2 className="font-semibold text-sm uppercase tracking-wide text-slate-300">
+            AI Market Briefing
+          </h2>
+        </div>
+        {data?.date && (
+          <span className="text-xs text-slate-400 shrink-0">{data.date}</span>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-2 animate-pulse">
+          <div className="h-3 bg-slate-600 rounded w-full" />
+          <div className="h-3 bg-slate-600 rounded w-5/6" />
+          <div className="h-3 bg-slate-600 rounded w-4/6" />
+        </div>
+      ) : (
+        <>
+          <p className="text-sm leading-relaxed text-slate-100">{data.briefing}</p>
+          {data.top_themes?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {data.top_themes.map((theme: string) => (
+                <span
+                  key={theme}
+                  className="text-xs bg-slate-600 text-slate-200 px-2.5 py-1 rounded-full capitalize"
+                >
+                  {theme}
+                </span>
+              ))}
+            </div>
+          )}
+          {data.generated_at && (
+            <p className="text-xs text-slate-500 mt-3">
+              Generated {new Date(data.generated_at).toLocaleTimeString("en-PK", {
+                hour: "2-digit", minute: "2-digit",
+              })}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 const FLAG_COLORS: Record<string, string> = {
   HIGH_PROFIT_GROWTH: "bg-green-100 text-green-800",
@@ -58,6 +127,9 @@ export default function DashboardPage() {
 
   return (
     <div>
+      <KSE100Chart />
+      <MarketBriefingCard />
+
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">All Companies</h1>

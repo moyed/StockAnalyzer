@@ -1,0 +1,282 @@
+[
+  {
+    "symbol": "ATRL",
+    "standard": {
+      "next_quarter_outlook": "For Q2 FY2026, Attock Refinery is expected to sustain strong profit growth driven by elevated refinery margins from ongoing Gulf tensions and export volumes of FFO, despite slower domestic demand. However, regulatory delays in the Refineries Upgradation Policy pose a headwind, and base effects may moderate profit growth sequentially.",
+      "projected_revenue_growth_min": 5,
+      "projected_revenue_growth_max": 10,
+      "projected_profit_growth_min": 20,
+      "projected_profit_growth_max": 35,
+      "key_catalysts": [
+        "Continued high refinery margins due to geopolitical tensions",
+        "Export volumes of FFO boosting top-line and margins"
+      ],
+      "key_risks": [
+        "Regulatory uncertainty around Refineries Upgradation Policy",
+        "Potential normalization of global refinery margins if tensions ease"
+      ],
+      "recommendation": "Buy",
+      "confidence": "high",
+      "target_upside_min_pct": 8,
+      "target_upside_max_pct": 16
+    },
+    "agentic": {
+      "next_quarter_outlook": "Attock Refinery is expected to post another strong quarter driven by export expansion and improved capacity utilization following the restart of its main crude distillation unit. Although lower crude oil prices may compress refinery margins, higher export volumes of furnace fuel oil (benefiting from local tax hikes) and a strong PSX environment should support earnings growth.",
+      "projected_revenue_growth_min": 8,
+      "projected_revenue_growth_max": 15,
+      "projected_profit_growth_min": 12,
+      "projected_profit_growth_max": 22,
+      "key_catalysts": [
+        "Export expansion (140,700+ tons FFO) benefiting from domestic tax disincentives",
+        "Restart of main crude distillation unit boosting throughput",
+        "Analyst target of PKR 1,136 implying 25% upside",
+        "Strong PSX momentum and positive management tone"
+      ],
+      "key_risks": [
+        "Sharp decline in crude oil prices (~23% in past month) compressing refining margins",
+        "Geopolitical uncertainty (US-Iran peace framework) could further pressure oil prices",
+        "Delay in government's Refineries Upgradation Policy hurting long-term capex plans",
+        "PKR depreciation could increase import costs"
+      ],
+      "recommendation": "Buy",
+      "confidence": "high",
+      "target_upside_min_pct": 10,
+      "target_upside_max_pct": 25,
+      "reasoning_summary": "ATRL delivered 90.3% profit growth in Q1 FY2026, supported by strong refinery margins from Gulf tensions, a record 140,700 tons of FFO exports, and positive management outlook. Recent restart of its main distillation unit signals operational normalization. While crude oil prices have fallen sharply (~23% to $80.6/bbl), which may compress margins, the company is pivoting to export markets where local tax hikes (40% increase) make exports more profitable. Analyst consensus targets PKR 1,136 (25% upside from current PKR 910). The high AI score (90/100) and flagship HIGH_PROFIT_GROWTH and EXPORT_EXPANSION support a bullish projection. Risks include further oil price declines and policy delays.",
+      "rounds_completed": 6,
+      "tool_calls_made": 5,
+      "metadata": {
+        "rounds_completed": 6,
+        "tool_calls_made": 5,
+        "model": "deepseek-4-flash",
+        "date_generated": "2026-06-21",
+        "agentic": true,
+        "engine": "gradient"
+      },
+      "evidence_trail": [
+        {
+          "type": "search",
+          "query": "crude oil price trend June 2026 impact on Pakistan refineries",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "Attock Refinery Limited ATRL Pakistan PSX news last 30 days",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "Pakistan energy sector trends 2026 PSX",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "ATRL Attock Refinery Limited analyst rating price target PSX Pakistan",
+          "reason": "",
+          "results_count": 5
+        }
+      ],
+      "reasoning_chain": [
+        {
+          "round": 1,
+          "summary": "{\n  \"thinking\": \"I need to analyze Attock Refinery's Q1-2026 signals to project Q2 FY2026. Key positives: 90.3% profit growth, margin improvement from geopolitical tensions, export milestone (140,700 tons FFO), and positive management tone. Gaps: current crude oil prices, PKR stability, government policy delays impact, and recent company news. I'll start with web search for crude oil trends, then company news for updates.\",\n  \"tool\": \"web_search\",\n  \"params\": {\n    \"query\": \"crude oil price tren"
+        },
+        {
+          "round": 2,
+          "summary": "{\n  \"thinking\": \"Crude oil has dropped significantly (22.75% in past month) to $80.64/bbl, partly due to US-Iran peace framework. This could compress ATRL's refinery margins, but the drop in feedstock costs might be offset by higher export volumes (taxes raised on local fuel oil sales, encouraging exports). Need to check ATRL's specific recent news and sector outlook.\",\n  \"tool\": \"company_news\",\n  \"params\": {\n    \"company\": \"ATRL\",\n    \"exchange\": \"PSX\"\n  }\n}"
+        },
+        {
+          "round": 3,
+          "summary": "{\n  \"thinking\": \"Found that ATRL restarted its main crude distillation unit after supply normalization - that's positive for production. However, crude oil prices have fallen sharply, and local fuel oil taxes were raised, boosting export incentives. Need to cross-check sector dynamics and validate key assumptions about profit growth sustainability.\",\n  \"tool\": \"sector_analysis\",\n  \"params\": {\n    \"sector\": \"refinery\",\n    \"country\": \"Pakistan\"\n  }\n}"
+        },
+        {
+          "round": 4,
+          "summary": "{\n  \"thinking\": \"Sector context shows PSX is at highs and energy dominates. Need to validate specific assumptions: Will lower crude oil prices hurt ATRL's margins? Are exports compensating for local tax impact? Let me check market sentiment and analyst views on ATRL specifically.\",\n  \"tool\": \"market_sentiment\",\n  \"params\": {\n    \"ticker\": \"ATRL\",\n    \"exchange\": \"PSX\"\n  }\n}"
+        },
+        {
+          "round": 5,
+          "summary": "{\n  \"thinking\": \"Analysts had a bullish target of Rs1,136 for June 2026 (from July 2025), implying strong potential. Current price ~910 PKR. Need to reassess given crude oil price drop and export dynamics. Let me validate one key assumption: Will the export-driven revenue compensate for margin compression from lower crude prices?\",\n  \"tool\": \"validate_assumption\",\n  \"params\": {\n    \"assumption\": \"ATRL's export expansion (140,700 tons FFO in Q1) will sustain profit growth despite lower crude oil "
+        },
+        {
+          "round": 6,
+          "summary": "{\n  \"thinking\": \"Round 6: Must finalize. Based on research: ATRL has strong Q1 profit growth (90.3%), margin improvement from geopolitical tensions, exported 140,700 tons FFO, restarted main unit, analyst target Rs1,136. However, crude oil has dropped ~23% to ~$80.6/bbl, which may compress margins. Local fuel oil taxes raised 40% incentivize exports. Positive management tone, PSX at highs. I project moderate growth due to volume expansion and export pivot offsetting margin compression. Confidenc"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "web_search",
+          "reason": "",
+          "timestamp": "2026-06-21T16:18:16.692931"
+        },
+        {
+          "tool": "company_news",
+          "reason": "",
+          "timestamp": "2026-06-21T16:18:28.358293"
+        },
+        {
+          "tool": "sector_analysis",
+          "reason": "",
+          "timestamp": "2026-06-21T16:18:35.672146"
+        },
+        {
+          "tool": "market_sentiment",
+          "reason": "",
+          "timestamp": "2026-06-21T16:18:43.714269"
+        },
+        {
+          "tool": "validate_assumption",
+          "reason": "",
+          "timestamp": "2026-06-21T16:18:52.724264"
+        }
+      ]
+    },
+    "std_time": 11.884248971939087,
+    "agent_time": 62.231420040130615
+  },
+  {
+    "symbol": "CNERGY",
+    "standard": {
+      "next_quarter_outlook": "For Q2 FY2026, Cnergyico is expected to sustain robust revenue growth of 18-25% year-on-year, driven by continued VLSFO bunkering ramp-up and resilient refinery throughput despite lingering geopolitical supply chain volatility. Profit growth is projected at 15-25% as improved crack spreads and cost optimization from SPM usage offset potential margin compression from fluctuating crude prices.",
+      "projected_revenue_growth_min": 18,
+      "projected_revenue_growth_max": 25,
+      "projected_profit_growth_min": 15,
+      "projected_profit_growth_max": 25,
+      "key_catalysts": [
+        "Expansion of VLSFO bunkering operations with growing marine demand",
+        "Sustained crack spread improvement from gasoline and diesel margins"
+      ],
+      "key_risks": [
+        "Renewed disruption in global crude supply chains from Strait of Hormuz tensions",
+        "Potential rupee depreciation increasing imported crude costs"
+      ],
+      "recommendation": "Buy",
+      "confidence": "medium",
+      "target_upside_min_pct": 5,
+      "target_upside_max_pct": 20
+    },
+    "agentic": {
+      "next_quarter_outlook": "Cnergyico is expected to maintain strong momentum in Q2 FY2026, driven by sustained healthy crack spreads, cost optimization from SPM usage, and ramp-up of VLSFO marine bunkering volumes. The company's vertical integration and improved refining margins should support another quarter of robust profitability.",
+      "projected_revenue_growth_min": 18,
+      "projected_revenue_growth_max": 25,
+      "projected_profit_growth_min": 20,
+      "projected_profit_growth_max": 30,
+      "key_catalysts": [
+        "Expansion of VLSFO bunkering operations",
+        "Continued favorable crack spreads for gasoline and diesel",
+        "Cost savings from SPM facility and optimized crude slate",
+        "Strong demand recovery in Pakistan's energy sector"
+      ],
+      "key_risks": [
+        "Volatility in global crude oil prices and crack spreads",
+        "PKR depreciation impacting import costs",
+        "Regulatory changes in fuel pricing or refinery upgrade requirements",
+        "Geopolitical tensions affecting supply chains"
+      ],
+      "recommendation": "Buy",
+      "confidence": "high",
+      "target_upside_min_pct": 10,
+      "target_upside_max_pct": 20,
+      "reasoning_summary": "Built on Q1-2026 signals (20% revenue growth, margin improvement, new VLSFO project) and confirmed by 9MFY26 profit of Rs17.1bn (turnaround from loss). Sector analysis supports sustained refining margins. Current price of PKR 8.22 offers upside given strong fundamentals.",
+      "rounds_completed": 6,
+      "tool_calls_made": 5,
+      "metadata": {
+        "rounds_completed": 6,
+        "tool_calls_made": 5,
+        "model": "deepseek-4-flash",
+        "date_generated": "2026-06-21",
+        "agentic": true,
+        "engine": "gradient"
+      },
+      "evidence_trail": [
+        {
+          "type": "search",
+          "query": "Cnergyico PK Limited Q2 FY2026 outlook revenue profit crude oil crack spreads Pakistan",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "Pakistan refinery sector outlook Q2 FY2026 crack spreads crude oil prices PSX",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "Cnergyico PK Limited CNERGY Pakistan PSX news last 30 days",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "Cnergyico Q2 FY2026 estimates analyst forecast revenue profit",
+          "reason": "",
+          "results_count": 5
+        },
+        {
+          "type": "search",
+          "query": "CNERGY Cnergyico PK Limited analyst rating price target PSX Pakistan",
+          "reason": "",
+          "results_count": 5
+        }
+      ],
+      "reasoning_chain": [
+        {
+          "round": 1,
+          "summary": "{\n  \"thinking\": \"I need to analyze historical signals for Cnergyico PK Limited. Revenue growth is strong at 20%, gross margins are improving due to better crack spreads and SPM cost optimization, and a new VLSFO marine bunkering project has started. However, profit growth is unspecified, and exchange gain/loss data is missing. Key unknowns: sustainability of crack spreads, impact of PKR fluctuations, VLSFO volume ramp-up, and sector-wide demand. I'll start with web_search for recent financial ne"
+        },
+        {
+          "round": 2,
+          "summary": "{\n  \"thinking\": \"The search results confirm strong profitability: Rs17.1 billion profit in 9MFY26 versus a loss last year. This underscores margin improvement and turnaround. However, Q2 FY2026 specific data is not yet public; the 9M period ended March 31, 2026, which covers Q1-Q3. I need to validate the sustainability of crack spreads, the ramp-up of VLSFO bunkering, and any exchange rate effects. I'll now search for sector trends and crude oil price outlook to assess the refining margin enviro"
+        },
+        {
+          "round": 3,
+          "summary": "{\n  \"thinking\": \"The sector insights highlight that import parity pricing benefits refiners when global cracks are wide, but also mention risks from deregulation and Middle East tensions. Cnergyico's Q2 FY2026 (Oct-Dec 2026) will be influenced by winter demand for diesel/heating oil and ongoing VLSFO ramp-up. I need to check the company's specific capacity utilization, production data, and any recent analyst reports. I'll now use company_news to get recent updates.\",\n  \"tool\": \"company_news\",\n  "
+        },
+        {
+          "round": 4,
+          "summary": "{\n  \"thinking\": \"The company_news results are mostly general pages. I need specific financial data for the upcoming quarter. I'll search for Cnergyico's quarterly financial estimates or analyst projections for Q2 FY2026, and also check if there are any recent disclosures about production or sales volumes.\",\n  \"tool\": \"web_search\",\n  \"params\": {\n    \"query\": \"Cnergyico Q2 FY2026 estimates analyst forecast revenue profit\"\n  }\n}"
+        },
+        {
+          "round": 5,
+          "summary": "{\n  \"thinking\": \"The search didn't yield direct analyst estimates for Q2 FY2026. However, I have strong historical data: 9MFY26 profit of Rs17.1bn implies average quarterly profit of ~Rs1.9bn (though Q1 had a loss? Actually Q1-2026 signals show 20% revenue growth, and no profit growth specified, but 9M profit of Rs17.1bn suggests Q2 and Q3 were strong). I also see CNERGY price is currently 8.22, but TradingView shows 8.52 (likely lag). I need to validate crack spread sustainability and PKR impac"
+        },
+        {
+          "round": 6,
+          "summary": "{\n  \"thinking\": \"Market sentiment tools didn't show specific analyst price targets, but the overall data confirms strong turnaround. The VLSFO bunkering project is a new revenue stream, and margin improvement from crack spreads is likely to persist given global supply tightness. I now have enough context to finalize: Q2 FY2026 projection should reflect continued revenue growth (20%+), profit growth (possibly 25-30% due to margins), and high confidence given the 9M profit surge. I'll now finalize"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "web_search",
+          "reason": "",
+          "timestamp": "2026-06-21T16:19:31.130620"
+        },
+        {
+          "tool": "web_search",
+          "reason": "",
+          "timestamp": "2026-06-21T16:19:45.979156"
+        },
+        {
+          "tool": "company_news",
+          "reason": "",
+          "timestamp": "2026-06-21T16:19:56.748623"
+        },
+        {
+          "tool": "web_search",
+          "reason": "",
+          "timestamp": "2026-06-21T16:20:04.767370"
+        },
+        {
+          "tool": "market_sentiment",
+          "reason": "",
+          "timestamp": "2026-06-21T16:20:23.114288"
+        }
+      ]
+    },
+    "std_time": 12.10080599784851,
+    "agent_time": 67.29401707649231
+  }
+]

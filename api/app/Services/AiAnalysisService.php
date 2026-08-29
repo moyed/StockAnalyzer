@@ -12,7 +12,7 @@ class AiAnalysisService
 
     public function __construct()
     {
-        $this->aiEngineUrl = config('services.ai_engine.url', 'http://localhost:8001');
+        $this->aiEngineUrl = config('services.ai_engine.url', 'http://localhost:8003');
     }
 
     /**
@@ -20,7 +20,10 @@ class AiAnalysisService
      */
     public function analyze(Filing $filing): array
     {
-        $response = Http::timeout(120)->post("{$this->aiEngineUrl}/analyze", [
+        // Must stay below the queue worker --timeout so a slow AI engine fails
+        // this attempt cleanly instead of the worker being force-killed (which
+        // re-queues the job as a crashed attempt and multiplies duplicates).
+        $response = Http::timeout(240)->connectTimeout(10)->post("{$this->aiEngineUrl}/analyze", [
             'filing_id' => $filing->id,
             'pdf_url'   => $filing->pdf_url,
             'company'   => $filing->company->name,
